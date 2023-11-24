@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Peta Desa Klasifikasi Wisata</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+
+    <!-- Marker Cluster -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-markercluster/MarkerCluster.css" />
+    <link rel="stylesheet" href="assets/plugins/leaflet-markercluster/MarkerCluster.Default.css" />
+    <!-- Routing -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-routing/leaflet-routing-machine.css" />
+    <!-- Search CSS Library -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-search/leaflet-search.css" />
+    <!-- Geolocation CSS Library for Plugin -->
+    <link rel="stylesheet"
+        href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.css" />
+    <!-- Leaflet Mouse Position CSS Library -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-mouseposition/L.Control.MousePosition.css" />
+    <!-- Leaflet Measure CSS Library -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-measure/leaflet-measure.css" />
+    <!-- EasyPrint CSS Library -->
+    <link rel="stylesheet" href="assets/plugins/leaflet-easyprint/easyPrint.css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+
+
+    <style>
+        html,
+        body,
+        #map {
+            height: 100%;
+            width: 100%;
+            margin: 0px;
+        }
+
+        /* Background pada Judul */
+        *.info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .info h2 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+
+    <div class="b-example-divider"></div>
+    <div id="map"></div>
+
+    <!-- Include your GeoJSON data -->
+    <script src="./data.js"></script>
+
+    <!-- Leaflet and Plugins -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script src="assets/plugins/leaflet-markercluster/leaflet.markercluster.js"></script>
+    <script src="assets/plugins/leaflet-markercluster/leaflet.markercluster-src.js"></script>
+    <script src="assets/plugins/leaflet-routing/leaflet-routing-machine.js"></script>
+    <script src="assets/plugins/leaflet-routing/leaflet-routing-machine.min.js"></script>
+    <script src="assets/plugins/leaflet-search/leaflet-search.js"></script>
+    <script src="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-locatecontrol/v0.43.0/L.Control.Locate.min.js"></script>
+    <script src="assets/plugins/leaflet-mouseposition/L.Control.MousePosition.js"></script>
+    <script src="assets/plugins/leaflet-measure/leaflet-measure.js"></script>
+    <script src="assets/plugins/leaflet-easyprint/leaflet.easyPrint.js"></script>
+
+    <script>
+        // Initialize the map
+        var map = L.map("map").setView([-7.7956, 110.3695], 10);
+
+        // Basemaps
+        var basemap1 = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution:
+                    'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }
+        );
+        basemap1.addTo(map);
+
+        // // Create a GeoJSON layer for polygon data
+        // var wfsgeoserver1 = L.geoJson(null, {
+        //     style: function (feature) {
+        //         // Adjust this function to define styles based on your polygon properties
+        //         var value = feature.properties.Klasifikas; // Change this to your actual property name
+
+        //         var fillcolor;
+        //         if (value === "Maju") {
+        //             fillColor = 'green';
+        //         } else if (value === "Berkembang") {
+        //             fillColor = 'yellow';
+        //         } else if (value === "Mandiri") {
+        //             fillColor = 'purple';
+        //         } else if (value === "Rintisan") {
+        //             fillColor = "red";
+        //         } else {
+        //             fillColor = "gray";
+        //         }
+
+        //         return {
+        //             fillColor: fillcolor
+        //         };
+        //     },
+        //     onEachFeature: function (feature, layer) {
+        //         // Adjust the popup content based on your polygon properties
+        //         var content =
+        //             "Nama Desa: " +
+        //             feature.properties.Nama;
+        //         content += "<br>" +
+        //             "Alamat: " +
+        //             feature.properties.Alamat +
+        //             "<br>" +
+        //             "Klasifikasi: " +
+        //             feature.properties.Klasifikas +
+        //             "<br>";
+
+        //         layer.bindPopup(content);
+        //     }
+        // });
+
+        // // Fetch GeoJSON data from geoserver.php
+        // $.getJSON("wfsgeoserver1.php", function (data) {
+        //     wfsgeoserver1.addData(data);
+        //     wfsgeoserver1.addTo(map);
+        //     map.fitBounds(wfsgeoserver.getBounds());
+        // });
+
+        // Title
+        var title = new L.Control();
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create("div", "info");
+            this.update();
+            return this._div;
+        };
+        title.update = function () {
+            this._div.innerHTML =
+                "<h4> Data Persebaran Desa Wisata di Kabupaten Sleman </h4>Berdasarkan data Pemerintah Kabupaten Sleman";
+        };
+        title.addTo(map);
+
+        // Watermark 
+        L.Control.Watermark = L.Control.extend({
+            onAdd: function (map) {
+                var container = L.DomUtil.create("div", "leaflet-control-watermark");
+                var img = L.DomUtil.create("img", "watermark-image");
+                img.src = "assets/img/logo/LOGO_SIG_BLUE.png";
+                img.style.width = "120px";
+                container.appendChild(img);
+                return container;
+            },
+        });
+        L.control.watermark = function (opts) {
+            return new L.Control.Watermark(opts);
+        };
+
+        L.control.watermark({ position: "bottomleft" }).addTo(map);
+
+        // Layer Marker
+        var addressPoints = [
+            [-7.701354, 110.373895, "Desa Wisata Brayut"],
+            [-7.739766, 110.302601, "Desa Wisata Grogol"],
+            [-7.642679, 110.429897, "Desa Wisata Pentingsari"],
+            [-7.642444, 110.362179, "Desa Wisata Sedjarah"],
+            [-7.80983, 110.23495, "Desa Wisata Gamplong"],
+            [-7.62571, 110.371698, "Desa Wisata Pulesari"],
+            [-7.638727, 110.382783, "Desa Wisata Garongan"],
+            [-7.63026, 110.397537, "Desa Wisata Pancoh"],
+            [-7.702665, 110.449272, "Blue Lagoon"],
+            [-7.660676, 110.38023, "Desa Wisata Gabugan"],
+            [-7.626954, 110.364188, "Desa Wisata Ploso Kuning"],
+            [-7.78127, 110.506652, "Desa Wisata Sambirejo Breksi"],
+            [-7.704495, 110.380523, "Tanjung"],
+            [-7.813438, 110.503505, "Rumah Dome"],
+            [- 7.667877, 110.362229, "Desa Wisata Kadisobo II"],
+            [- 7.599699, 110.394016, "Desa Wisata Tunggul Arum"],
+            [- 7.646104, 110.356904, "Desa Wisata Ledok Nongko"],
+            [- 7.700331, 110.36108, "Desa Wisata Pendidikan dan Ketahanan Pangan"],
+            [- 7.606206, 110.39665, "Desa Wisata Nganggring"],
+            [- 7.647658, 110.376772, "Desa Wisata Sangurejo"],
+            [- 7.800205, 110.292403, "Desa Wisata Gamol"],
+            [- 7.709766, 110.367134, "Desa Wisata Karang Tanjung"],
+            [- 7.74448, 110.447503, "Desa Wisata Bromonilan"],
+            [- 7.612988, 110.375897, "Desa Wisata Eksotika Krasak Jolontoro Sempu"],
+            [- 7.625274, 110.368864, "Desa Wisata Pulewulung"],
+            [- 7.73583, 110.23265, "Desa Wisata Diro"],
+            [- 7.589465, 110.422434, "Desa  Wisata Turgo - Merapi"],
+            [- 7.615287, 110.403531, "Tegal Loegood"],
+            [- 7.655846, 110.3776, "Desa Wisata Kembangarum"],
+            [- 7.819963, 110.542855, "Desa Wisata Nawung	Nawung"],
+            [- 7.73146, 110.235275, "Desa Wisata Kerajinan Bambu"],
+            [- 7.783482, 110.336691, "Desa Wisata Lingkungan Sukunan"],
+            [- 7.706569, 110.474232, "Mina Wisata Bokesan"],
+            [- 7.742877, 110.329156, "Desa Wisata Ketingan"],
+            [- 7.753702, 110.313469, "Desa Wisata Cibuk Kidul"],
+            [- 7.609496, 110.390592, "Ngembesan(Goa Lawa)"],
+            [- 7.658948, 110.366941, "Desa Wisata Kali Klegung"],
+            [- 7.725761, 110.485059, "Desa Wisata Kali Opak"],
+            [- 7.783207, 110.257692, "Kampung satwa"],
+            [- 7.66689, 110.374411, "Lembah Sempor"],
+            [- 7.803608, 110.478274, "Desa Wisata Pengklik"],
+            [- 7.671114, 110.397587, "Desa Wisata Samberembe"],
+            [- 7.709487, 110.269732, "Desa Wisata Sendang Penjalin"],
+            [- 7.719431, 110.34939, "Puri Mataram"],
+            [- 7.663059, 110.300647, "Pesona Lembah Krasak Jlapan"],
+            [- 7.773927, 110.225211, "Pelangi Progo"],
+            [- 7.721293, 110.348662, "Dewi Flory Plaosan"],
+            [- 7.761544, 110.331304, "Desa Wisata Mlangi"],
+            [- 7.774736, 110.489515, "Desa Wisata Budaya Plempoh"],
+            [- 7.704818, 110.352745, "Desa Wisata Beteng"],
+            [- 7.717343, 110.386606, "Kebon Ndeso Wonorejo"],
+            [- 7.610569, 110.379012, "Tlatar Kandangan"],
+            [- 7.641886, 110.450065, "Bulaksalak"],
+            [- 7.72979, 110.459265, "Buah Manis"],
+            [- 7.63055, 110.341553, "Grojogan Watu purbo"],
+            [- 7.716122, 110.390324, "Watu Ledhek"],
+            [- 7.737384, 110.416031, "Desa Wisata Ledok Blotan"],
+            [- 7.817822, 110.512464, "Desa Wisata Bukit Teletubbies"],
+            [- 7.636278, 110.360314, "Agrowisata"],
+            [- 7.680275, 110.368166, "Desa Wisata Plalangan"],
+            [- 7.774668, 110.399367, "Ekowisata Nologaten"],
+            [- 7.737495, 110.385854, "Green Kayen"],
+            [- 7.748562, 110.333809, "Dewi Rawe"],
+            [- 7.806644, 110.525925, "Wisata Bukit Mintorogo"],
+            [- 7.751096, 110.415822, "Gebang Park"],
+            [- 7.713477, 110.434703, "Desa Wisata Sawahan Lor"],
+            [- 7.776335, 110.240105, "Desa Wisata Pendulan"],
+            [- 7.691204, 110.361551, "Desa Wisata Karang Sleman"],
+            [- 7.648792, 110.384594, "Dewi Pinang"],
+            [- 7.647796, 110.451045, "Desa Wisata Dwi Saka Empu"],
+            [- 7.599687, 110.449202, "Desa Wisata Huntap Pagerjurang"],
+            [- 7.671615, 110.325946, "Plumbon(Taman Joyodikraman)"],
+            [- 7.773856, 110.329538, "Kampung Nglarang"],
+            [- 7.810054, 110.511208, "Desa Wisata Pereng Abyudaya"],
+            [- 7.681434, 110.453369, "Desa Wisata Ledok Balong"],
+            [- 7.738681, 110.443654, "Dewi Kalkun Sempu"],
+            [- 7.779346, 110.329086, "Bedok Ilir"],
+            [- 7.769986, 110.476863, "Umbul Sidomulyo Kalasan"],
+            [- 7.612561, 110.452501, "Desa Wisata Batur Berdikari"],
+            [- 7.740716, 110.346166, "Desa Wisata Tegal Arum"],
+        ];
+        var markers = L.markerClusterGroup();
+        for (var i = 0; i < addressPoints.length; i++) {
+            var a = addressPoints[i];
+            var title1 = a[2];
+            var marker = L.marker(new L.LatLng(a[0], a[1]), { title: title1 });
+
+            marker.bindPopup(title1);
+            markers.addLayer(marker);
+        }
+        map.addLayer(markers);
+
+        /* Scale Bar */
+        L.control.scale({
+            maxWidth: 150, position: 'bottomright'
+        }).addTo(map)
+
+
+        // Basemaps
+        var basemap1 = L.tileLayer(
+            "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
+            {
+                maxZoom: 19,
+                attribution:
+                    'Map data © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+            }
+        );
+
+        var basemap2 = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+            {
+                attribution:
+                    'Tiles &copy; Esri | <a href="DIVSIGUGM" target="_blank">DIVSIG UGM</a>',
+            }
+        );
+
+        var basemap3 = L.tileLayer(
+            "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+            {
+                attribution:
+                    'Tiles &copy; Esri | <a href="Lathan WebGIS" target="_blank">DIVSIG UGM</a>',
+            }
+        );
+
+        var basemap4 = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
+            {
+                attribution: 'Tiles &copy; OpenTopoMap | <a href="Lathan WebGIS" target="_blank">Azrill</a>'
+            });
+
+        basemap1.addTo(map);
+
+        var baseMaps = {
+            OpenStreetMap: basemap1,
+            "Esri World Street": basemap2,
+            "Esri Imagery": basemap3,
+            "Open Topo Map": basemap4,
+        };
+
+        L.control.layers(baseMaps).addTo(map);
+
+        // Plugin EasyPrint
+        L.easyPrint({
+            title: "Print",
+        }).addTo(map);
+
+        // // Plugin Search
+        // var searchControl = new L.Control.Search({
+        //     position: "topleft",
+        //     layer: wfsgeoserver1, // Nama variabel layer
+        //     propertyName: "Klasifikas", // Field untuk pencarian
+        //     marker: false,
+        //     moveToLocation: function (latlng, title, map) {
+        //         var zoom = map.getBoundsZoom(latlng.layer.getBounds());
+        //         map.setView(latlng, zoom);
+        //     },
+        // });
+        // searchControl
+        //     .on("search:locationfound", function (e) {
+        //         e.layer.setStyle({
+        //             fillColor: "#ffff00",
+        //             color: "#0000ff",
+        //         });
+        //     })
+        //     .on("search:collapse", function (e) {
+        //         wfsgeoserver1.eachLayer(function (layer) {
+        //             wfsgeoserver1.resetStyle(layer);
+        //         });
+        //     });
+
+        // map.addControl(searchControl);
+
+        // Plugin Geolocation
+        var locateControl = L.control
+            .locate({
+                position: "topleft",
+                drawCircle: true,
+                follow: true,
+                setView: true,
+                keepCurrentZoomLevel: false,
+                markerStyle: {
+                    weight: 1,
+                    opacity: 0.8,
+                    fillOpacity: 0.8,
+                },
+                circleStyle: {
+                    weight: 1,
+                    clickable: false,
+                },
+                icon: "fas fa-crosshairs",
+                metric: true,
+                strings: {
+                    title: "Click for Your Location",
+                    popup: "You're here. Accuracy {distance} {unit}",
+                    outsideMapBoundsMsg: "Not available",
+                },
+                locateOptions: {
+                    maxZoom: 16,
+                    watch: true,
+                    enableHighAccuracy: true,
+                    maximumAge: 10000,
+                    timeout: 10000,
+                },
+            })
+            .addTo(map);
+
+        // Plugin Mouse Position Coordinate
+        L.control
+            .mousePosition({
+                position: "bottomright",
+                separator: ",",
+                prefix: "Point Coodinate: ",
+            })
+            .addTo(map);
+
+        // Plugin Routing
+        L.Routing.control({
+            waypoints: [
+                L.latLng(-7.590700061386111, 110.42768787014823),
+                L.latLng(-7.78910508484698, 110.36342969381099),
+            ],
+            routeWhileDragging: true,
+        }).addTo(map);
+    
+
+        
+    </script>
+</body>
+
+</html>
